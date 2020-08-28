@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 import firebase from "firebase";
+import { get, flatten, uniq } from "lodash";
 import liff from "@line/liff";
 
 firebase.initializeApp({
@@ -51,20 +52,31 @@ const App = () => {
   const [click, setClick] = useState(true);
   const [finish, setFinish] = useState(false);
   const [lineInit, setLineInit] = useState(false);
-  const [userPick, setUserPick] = useState([]);
+  const pickRef = useRef("");
+
+  // 每次皆需做替換！！
+  const CURRENT_PROJECT = "yogibo";
 
   // import all images
   const importAll = (r) => {
     return r.keys().map(r);
   };
-
   const imagesList = importAll(require.context("images", false, /\.png$/));
-  const imagesId = imagesList.map((img) =>
-    img.split("/")[3].split(".").shift()
-  );
+  const imagesId = imagesList.map((img) => {
+    return img.split("/")[4].split(".").shift();
+  });
 
   // Initialize Firebase
   const database = firebase.database();
+
+  useEffect(() => {
+    database.ref("/").on("value", (e) => {
+      const lists = Object.entries(get(e.val(), CURRENT_PROJECT, "")).map(
+        (x) => x[1]
+      );
+      pickRef.current = lists;
+    });
+  }, []);
 
   useEffect(() => {
     // init LIFF
@@ -73,6 +85,7 @@ const App = () => {
     });
   }, []);
 
+  // pick images
   const checkImagePick = (id) => {
     let newList = pickList;
     if (newList.indexOf(id) !== -1) {
@@ -101,53 +114,65 @@ const App = () => {
     });
   }, [click]);
 
+  // send liff message after click button
   const sendLIFFMessage = (value) => {
     if (!liff.isInClient()) {
-      console.log("abc");
+      console.log("is not at mobile");
     } else {
+      const totalText = () => {
+        const text = value.total.map((t) => {
+          return `${t.name}： ${t.count}張\n`;
+        });
+        return text.join("");
+      };
       liff
         .sendMessages([
           {
             type: "text",
-            text: `我已選擇了${value}\n`,
+            text: `我已選擇了${value.picked.pop()}`,
+          },
+          {
+            type: "text",
+            text: `現在的統計為 - \n${totalText()}`,
           },
         ])
-        .then(function () {
+        .then(() => {
           liff.closeWindow();
         });
     }
   };
 
-  const pushResult = () => {
-    return new Promise((resolve, reject) => {
-      database.ref("/voiceTube").push(pickList);
-      resolve();
-    });
-  };
-
-  const calculate = () => {
-    return new Promise((resolve, reject) => {
-      database.ref("/").once("value", (e) => {
-        const lists = Object.entries(e.val().voiceTube).map((x) => x[1]);
-        // const x = imagesId.map((id) => {
-        //   return {
-        //     name: id,
-        //     count: 0,
-        //   };
-        // });
-        console.log(lists);
-        resolve(lists);
-      });
-    });
-  };
-
   const onClick = () => {
-    pushResult()
-      .then(calculate)
+    return new Promise((resolve, reject) => {
+      database.ref(`/${CURRENT_PROJECT}`).push(pickList);
+      resolve();
+    })
+      .then(() => {
+        const getAllPicks = flatten(pickRef.current);
+        const getUniqPicks = uniq(getAllPicks);
+        let counts = [];
+        getUniqPicks.map((pick) => {
+          counts.push({
+            name: pick,
+            count: getAllPicks.filter((picks) => picks === pick).length,
+          });
+        });
+        counts.sort((a, b) => {
+          let numbers = (num) => {
+            let result = num.name.split("_")[1];
+            if (result.includes("-")) return result.split("-")[0];
+            return result;
+          };
+          return numbers(a) - numbers(b);
+        });
+        return {
+          picked: pickRef.current,
+          total: counts,
+        };
+      })
       .then((value) => {
-        console.log(userPick);
         setFinish(true);
-        sendLIFFMessage(value.pop());
+        sendLIFFMessage(value);
       });
   };
 
