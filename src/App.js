@@ -63,7 +63,7 @@ const App = () => {
   };
   const imagesList = importAll(require.context("images", false, /\.png$/));
   const imagesId = imagesList.map((img) => {
-    return img.split("/")[4].split(".").shift();
+    return img.split("/").pop().split(".").shift();
   });
 
   // Initialize Firebase
@@ -100,7 +100,7 @@ const App = () => {
   const imageBlock = useCallback(() => {
     return imagesList.map((img, index) => {
       return (
-        <ImageBlock pickList={pickList} id={imagesId[index]}>
+        <ImageBlock pickList={pickList} id={imagesId[index]} key={index}>
           <Checkbox type="checkbox" id={imagesId[index]} />
           <label htmlFor={imagesId[index]}>
             <Image
