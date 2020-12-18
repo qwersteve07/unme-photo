@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/unme-photo/static/js/main.4634af99.chunk.js",
-    "main.js.map": "/unme-photo/static/js/main.4634af99.chunk.js.map",
+    "main.js": "/unme-photo/static/js/main.c470bfa4.chunk.js",
+    "main.js.map": "/unme-photo/static/js/main.c470bfa4.chunk.js.map",
     "runtime-main.js": "/unme-photo/static/js/runtime-main.83931533.js",
     "runtime-main.js.map": "/unme-photo/static/js/runtime-main.83931533.js.map",
     "static/js/2.36416220.chunk.js": "/unme-photo/static/js/2.36416220.chunk.js",
     "static/js/2.36416220.chunk.js.map": "/unme-photo/static/js/2.36416220.chunk.js.map",
     "index.html": "/unme-photo/index.html",
-    "precache-manifest.74e18288495b34d8cf7fcf0306e7027b.js": "/unme-photo/precache-manifest.74e18288495b34d8cf7fcf0306e7027b.js",
+    "precache-manifest.d77f688de7a5fff58611be37b5774a11.js": "/unme-photo/precache-manifest.d77f688de7a5fff58611be37b5774a11.js",
     "service-worker.js": "/unme-photo/service-worker.js",
     "static/js/2.36416220.chunk.js.LICENSE.txt": "/unme-photo/static/js/2.36416220.chunk.js.LICENSE.txt",
     "static/media/IMG_0227.jpg": "/unme-photo/static/media/IMG_0227.09253885.jpg",
@@ -269,6 +269,6 @@
   "entrypoints": [
     "static/js/runtime-main.83931533.js",
     "static/js/2.36416220.chunk.js",
-    "static/js/main.4634af99.chunk.js"
+    "static/js/main.c470bfa4.chunk.js"
   ]
 }
