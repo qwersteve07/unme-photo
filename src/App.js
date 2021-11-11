@@ -3,6 +3,7 @@ import styled from "styled-components";
 import firebase from "firebase";
 import { get, flatten, uniq } from "lodash";
 import liff from "@line/liff";
+import "lazysizes";
 
 firebase.initializeApp({
   apiKey: "AIzaSyBu6AZ7U-mXlw9pInObwtaCuW02u01-32M",
@@ -19,10 +20,27 @@ const ImageBlock = styled.div`
   width: 100%;
   margin: 10px;
   box-sizing: border-box;
-  border: ${(props) =>
-    props.pickList.indexOf(props.id) !== -1
-      ? "4px solid red"
-      : "4px solid transparent"};
+  position: relative;
+  &:before {
+    ${(props) =>
+      props.pickList.indexOf(props.id) !== -1
+        ? `content: "已選擇";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: white;
+    background: rgba(18, 132, 255, 0.5);
+    width: 100%;
+    height: 100%;
+    font-family:PingFang TC, Noto Sans CJK TC, Noto Sans TC, Microsoft JhengHei;
+    font-weight: bold;
+    letter-spacing: 2px;
+    position: absolute;
+    pointer-events: none`
+        : ""}
+  }
+  border: $4px solid transparent;
 `;
 const Image = styled.img`
   width: 100%;
@@ -55,13 +73,14 @@ const App = () => {
   const pickRef = useRef("");
 
   // 每次皆需做替換！！
-  const CURRENT_PROJECT = "yogibo";
+  // 記得確認現在的寫入規則是否超時 https://console.firebase.google.com/u/0/project/unme-test-8e49b/database/unme-test-8e49b/rules
+  const CURRENT_PROJECT = "UP-PRODUCTS";
 
   // import all images
   const importAll = (r) => {
     return r.keys().map(r);
   };
-  const imagesList = importAll(require.context("images", false, /\.png$/));
+  const imagesList = importAll(require.context("images", false, /\.jpg$/));
   const imagesId = imagesList.map((img) => {
     return img.split("/").pop().split(".").shift();
   });
@@ -80,7 +99,7 @@ const App = () => {
 
   useEffect(() => {
     // init LIFF
-    liff.init({ liffId: "1654658636-pjJ15WdX" }).then(() => {
+    liff.init({ liffId: "1655422524-z7Y2doDm" }).then(() => {
       setLineInit(true);
     });
   }, []);
@@ -93,7 +112,7 @@ const App = () => {
     } else {
       newList.push(id);
     }
-    setPickList(newList);
+    setPickList(() => newList);
     setClick(!click);
   };
 
@@ -104,9 +123,10 @@ const App = () => {
           <Checkbox type="checkbox" id={imagesId[index]} />
           <label htmlFor={imagesId[index]}>
             <Image
-              src={img}
+              data-src={img}
               alt={imagesId[index]}
               onClick={() => checkImagePick(imagesId[index])}
+              className="lazyload"
             />
           </label>
         </ImageBlock>
@@ -138,6 +158,9 @@ const App = () => {
         ])
         .then(() => {
           liff.closeWindow();
+        })
+        .catch((err) => {
+          console.log("error", err);
         });
     }
   };
@@ -173,6 +196,7 @@ const App = () => {
       .then((value) => {
         setFinish(true);
         sendLIFFMessage(value);
+        console.log(value);
       });
   };
 
