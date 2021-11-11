@@ -80,7 +80,9 @@ const App = () => {
   const importAll = (r) => {
     return r.keys().map(r);
   };
-  const imagesList = importAll(require.context("images", false, /\.jpg$/));
+  const imagesList = importAll(
+    require.context("images", false, /\.(jpg|png)$/)
+  );
   const imagesId = imagesList.map((img) => {
     return img.split("/").pop().split(".").shift();
   });
