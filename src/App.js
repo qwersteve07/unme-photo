@@ -74,7 +74,7 @@ const App = () => {
 
   // 每次皆需做替換！！
   // 記得確認現在的寫入規則是否超時 https://console.firebase.google.com/u/0/project/unme-test-8e49b/database/unme-test-8e49b/rules
-  const CURRENT_PROJECT = "UP-PRODUCTS";
+  const CURRENT_PROJECT = "MAYO";
 
   // import all images
   const importAll = (r) => {
